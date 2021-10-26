@@ -4,8 +4,8 @@
  
 import numpy   as np      # general numpy
 
-SourcePointsFile = "SourcePoints"
-TargetPointsFile = "TargetPoints"
+SourcePointsFile = "SourcePoints.txt"
+TargetPointsFile = "TargetPoints.txt"
 
 #   Source points
 

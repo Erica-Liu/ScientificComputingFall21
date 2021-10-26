@@ -1,4 +1,4 @@
-#  Problem 2 in Homework 5
+#  Problem 2 in Homework 3
 #  Scientific Computing, Fall 2021, yl8801@nyu.edu
 #  Least Square Fitting
 
