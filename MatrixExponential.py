@@ -54,65 +54,68 @@ def meT(L, t, n):  # compute the matrix exponential using Taylor series
 
 #    Physical parameters
 
-d = 2  # size of the matrix
+d_list = [k*10 for k in range(5,7)]   # size of the matrix
 r_u = .5  # rate of going up:   k -: k+1 transition
 r_d = .2 # rate of going down: k -> k-1 transition
 r_l = (r_u + r_d)  # "loss rate" = rate to leave state k
-t = 1.  # time: Compute exp(tL)
-
+t_list = [10, 20, 30] # time: Compute exp(tL)
+print("\nRMS differences between computed matrix exponentials\n")
 #     Computational parameters
 
-n_T = 200  # number of Taylor series terms
-k = 11  # n = 2^k intervals for Runge Kutta, dt = t/n
+for t in t_list:
+    for d in d_list:
+        n_T = 150  # number of Taylor series terms
+        k = 11  # n = 2^k intervals for Runge Kutta, dt = t/n
 
-#    The generator matrix L, with up rate on the super-diagonal
-#    and down rate on the sub-diagonal.
+        #    The generator matrix L, with up rate on the super-diagonal
+        #    and down rate on the sub-diagonal.
 
-L = np.zeros([d, d])
-for i in range(1, d):
-    L[i, i - 1] = r_d
-    L[i - 1, i] = r_u
+        L = np.zeros([d, d])
+        for i in range(1, d):
+            L[i, i - 1] = r_d
+            L[i - 1, i] = r_u
 
-L[0, 0] = - r_u
-L[d - 1, d - 1] = - r_d
-for i in range(1, d - 1):
-    L[i, i] = -r_l
+        L[0, 0] = - r_u
+        L[d - 1, d - 1] = - r_d
+        for i in range(1, d - 1):
+            L[i, i] = -r_l
 
-#    Compute S = exp(tL) three ways
+        #    Compute S = exp(tL) three ways
 
-Se, condNum = mee(L, t)
-ST, maxNorm = meT(L, t, n_T)
-Sd = med(L, t, k)
+        Se, condNum = mee(L, t)
+        ST, maxNorm = meT(L, t, n_T)
+        Sd = med(L, t, k)
 
-#     The RMS differences between the computed matrices
+        #     The RMS differences between the computed matrices
 
-rms_eT = np.sqrt(np.sum((Se - ST) ** 2))
-rms_ed = np.sqrt(np.sum((Se - Sd) ** 2))
-rms_Td = np.sqrt(np.sum((ST - Sd) ** 2))
+        rms_eT = np.sqrt(np.sum((Se - ST) ** 2))
+        rms_ed = np.sqrt(np.sum((Se - Sd) ** 2))
+        rms_Td = np.sqrt(np.sum((ST - Sd) ** 2))
 
-#     Formatted output
+        #     Formatted output
 
-print("\nRMS differences between computed matrix exponentials\n")
-runInfo = "up rate = {r_u:8.1f}, down rate = {r_d:8.1f}, dimension is {d:3d}\n"
-runInfo = runInfo.format(r_u=r_u, r_d=r_d, d=d)
-print(runInfo)
 
-#print out the information for maxnorm and
-mee_info = "Eigenvalue method the condition number of R: {cond_num:14.6e}"
-mee_info = mee_info.format(cond_num = condNum)
-print(mee_info)
+        runInfo = "\n----------------------------------\nup rate = {r_u:8.1f}, down rate = {r_d:8.1f}, dimension is {d:3d}, final time is {t:3f}\n"
+        runInfo = runInfo.format(r_u=r_u, r_d=r_d, d=d, t=t)
+        print(runInfo)
 
-meT_info = "Taylor series method the largest norm:       {max_norm:14.6e}"
-meT_info = meT_info.format(max_norm = maxNorm)
-print(meT_info)
+        #print out the information for maxnorm and and condition number
+        mee_info = "Eigenvalue method the condition number of R: {cond_num:14.6e}"
+        mee_info = mee_info.format(cond_num = condNum)
+        print(mee_info)
+        
+        meT_info = "Taylor series method the largest norm:       {max_norm:14.6e}"
+        meT_info = meT_info.format(max_norm = maxNorm)
+        print(meT_info)
 
-eT_info = "\neigenvalue  vs. Taylor series: {rms_eT:14.6e},  with {n:4d} terms"
-ed_info = "eigenvalue  vs. RungeKutta:    {rms_ed:14.6e},  with   k = {k:2d}"
-Td_info = "Runge Kutta vs. Taylor series: {rms_Td:14.6e}"
-eT_info = eT_info.format(rms_eT=rms_eT, n=n_T)
-ed_info = ed_info.format(rms_ed=rms_ed, k=k)
-Td_info = Td_info.format(rms_Td=rms_Td)
 
-print(eT_info)
-print(ed_info)
-print(Td_info)
+        eT_info = "\neigenvalue  vs. Taylor series: {rms_eT:14.6e},  with {n:4d} terms"
+        ed_info = "eigenvalue  vs. RungeKutta:    {rms_ed:14.6e},  with   k = {k:2d}"
+        Td_info = "Runge Kutta vs. Taylor series: {rms_Td:14.6e}"
+        eT_info = eT_info.format(rms_eT=rms_eT, n=n_T)
+        ed_info = ed_info.format(rms_ed=rms_ed, k=k)
+        Td_info = Td_info.format(rms_Td=rms_Td)
+
+        print(eT_info)
+        print(ed_info)
+        print(Td_info)
